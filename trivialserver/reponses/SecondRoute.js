@@ -1,5 +1,6 @@
 import HtmlResponseBuilder from './HtmlResponseBuilder.js';
 
+
 export default class SecondRoute extends HtmlResponseBuilder {
 
   buildBody() {

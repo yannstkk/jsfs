@@ -1,26 +1,42 @@
-import ResponseBuilder from './ResponseBuilder.js';
 
-export default class JsonResponseBuilder extends ResponseBuilder {
-  #params;
+export default class ResponseBuilder {
 
-  constructor(request, response, url, status = 200, contentType = 'application/json') {
-    super(request, response, url, status, contentType);
+  #request;
+  #response;
+  #url;
+  #status;
+  #contentType;
+
+  constructor(request, response, url, status, contentType) {
+    this.#request = request;
+    this.#response = response;
+    this.#url = url;
+    this.#status = status;
+    this.#contentType = contentType;
+  }
+
+  get response() {
+    return this.#response;
+  }
+  get url() {
+    return this.#url;
   }
 
 
 
-  buildBody() {
-    this.#params = this.url.searchParams;
-    
-    const data = {};
-
-    for (const [key, value] of this.#params.entries()) {
-      data[key] = value;
-    }
-
-    data.date = new Date().toISOString();
-    this.response.write(JSON.stringify(data));
+  buildHeader() {
+    this.response.statusCode = this.#status;
+    this.response.setHeader('Content-Type', this.#contentType);
   }
 
-  buildFooter() {} // Vide, comme pour JSON
+ buildBody() {}
+
+  buildFooter() {}
+
+  build() {
+    this.buildHeader();
+    this.buildBody();
+    this.buildFooter();
+    this.response.end();
+  }
 }

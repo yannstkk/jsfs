@@ -1,9 +1,12 @@
 import { URL } from 'url';
 
-import FirstResponseBuilder from '../response/FirstResponseBuilder.js';
-import SecondResponseBuilder from '../response/SecondResponseBuilder.js';
-import JsonResponseBuilder from '../response/JsonResponseBuilder.js';
-import NotFoundResponseBuilder from '../response/NotFoundResponseBuilder.js';
+import FirstRoute from '../reponses/FirstRoute.js';
+import SecondRoute from '../reponses/SecondRoute.js';
+import JsonResponseBuilder from '../reponses/JsonResponseBuilder.js';
+import NotFoundResponse from '../reponses/NotFoundResponse.js';
+import RandomRoute from '../reponses/RandomRoute.js';
+import PublicFileResponseBuilder from '../reponses/PublicFileResponseBuilder.js';
+
 
 export default class RequestController {
 
@@ -33,6 +36,10 @@ export default class RequestController {
         new SecondRoute(this.#request, this.#response, this.#url).build();
       } else if (this.#url.pathname === '/json') {
         new JsonResponseBuilder(this.#request, this.#response, this.#url).build();
+      } else if (this.#url.pathname === '/random') {
+        new RandomRoute(this.#request, this.#response, this.#url).build();
+      } else if (this.#url.pathname.startsWith('/public')) {
+        new PublicFileResponseBuilder(this.#request, this.#response, this.#url).buildResponse();
       } else {
         new NotFoundResponse(this.#request, this.#response, this.#url).build();
       }

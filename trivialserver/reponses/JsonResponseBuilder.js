@@ -5,7 +5,7 @@ export default class JsonResponseBuilder extends ResponseBuilder {
 
 
 
-  constructor(request, response, url, status = 200, contentType) {
+  constructor(request, response, url, status = 200, contentType = 'application/json') {
     super(request, response, url, status, contentType);
 
   }
@@ -27,11 +27,13 @@ export default class JsonResponseBuilder extends ResponseBuilder {
     }
 
     data.date = new Date().toISOString();
-    this.res.write(JSON.stringify(data));
+    this.response.write(JSON.stringify(data));
   }
 
   
-  buildHeader() {} 
+  buildHeader() {
+    super.buildHeader();
+  } 
 
   buildFooter() {} 
 }
