@@ -2,18 +2,10 @@ import ResponseBuilder from "./ResponseBuilder.js";
 import {readFileSync, constants , accessSync} from 'fs';
 import path from "path";
 
-
 export default class PublicFileResponseBuilder extends ResponseBuilder {
 
-    #url; 
-
     constructor(request, response , url){
-        super(request, response, 200, 'text/plain');
-        this.#url = url ;
-    }
-
-    get url(){
-        return this.#url;
+        super(request, response, url, 200, 'text/html');  
     }
 
     prepareResponse(){
@@ -34,7 +26,7 @@ export default class PublicFileResponseBuilder extends ResponseBuilder {
         catch(err){
             console.error("Erreur :", err.message);
             this.response.statusCode = 404;
-            this.response.setHeader("Content-Type", "image/x-icon");
+            this.response.setHeader("Content-Type", "text/html");  // ✅ Changé de 'image/x-icon' en 'text/html'
 
             this.response.write('<h1>Error <span style="color: red;">404</span> : File not found </h1>');
         }
@@ -44,6 +36,4 @@ export default class PublicFileResponseBuilder extends ResponseBuilder {
             }
         }
     }
-        
-
 }

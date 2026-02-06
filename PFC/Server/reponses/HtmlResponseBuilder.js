@@ -27,18 +27,6 @@ export default class HtmlResponseBuilder extends ResponseBuilder {
 
 
 
-  buildFooter() {
-    const date = new Date().toISOString();
-
-
-
-    this.response.write(`
-        <footer>
-          <p>reponse generee le ${date}</p>
-        </footer>
-      </body>
-      </html>
-    `);
-  }
+  buildFooter() { }
 }
 
