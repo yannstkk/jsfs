@@ -15,18 +15,18 @@ export default class HtmlResponseBuilder extends ResponseBuilder {
   buildHeader() {
     super.buildHeader();
     this.response.write(`
-      <html>
         <head>
           <title>Node TP</title>
           <link href="./public/style/style.css" rel="stylesheet" type="text/css">
           <img src="./public/img/javaclasse.png" alt="timoleon bien sur"></img>
         </head>
-        <body>
     `);
   }
 
 
 
-  buildFooter() { }
+  buildFooter() {    
+   this.response.write(`<footer style="background-color: #f0f0f0; padding: 10px; text-align: center;"> my footer </footer>`); 
+ }
 }
 

@@ -29,7 +29,7 @@ export default class ResponseBuilder {
     this.response.setHeader('Content-Type', this.#contentType);
   }
 
- buildBody() {}
+  buildBody() {}
 
   buildFooter() {}
 

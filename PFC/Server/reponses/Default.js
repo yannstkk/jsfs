@@ -1,8 +1,8 @@
-import ResponseBuilder from './ResponseBuilder.js';
+import HtmlResponseBuilder from './HtmlResponseBuilder.js';
 
 
 
-export default class Default extends ResponseBuilder {
+export default class Default extends HtmlResponseBuilder {
 
   constructor(request, response, url, status = 200) {
     super(request, response, url, status, 'text/html');
@@ -14,15 +14,14 @@ export default class Default extends ResponseBuilder {
   
 buildHeader() {
     super.buildHeader();
-    this.response.write(`<!DOCTYPE html><html>...`);
 }
 
 buildBody() {
-    this.response.write(`<h1>Bienvenue</h1>...`); 
+    this.response.write(`<h1>Bienvenue a la page default</h1>`); 
 }
 
 buildFooter() {
-    this.response.write(`</body></html>`); 
+  super.buildFooter();
 }
 
     

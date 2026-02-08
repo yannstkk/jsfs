@@ -37,11 +37,12 @@ export default class IOController {
         this.#io.emit('users-list', { users: connectedUsers });
     }
 
+
+    
     leave(socket) {
         const userName = this.#clients.get(socket.id) || 'unknown';
         console.log(`deconnexion du socket ${socket.id} (user : ${userName})`);
         
-        // Informer les autres utilisateurs
         socket.broadcast.emit('user-disconnected', { userName });
         
         this.#clients.delete(socket.id);
