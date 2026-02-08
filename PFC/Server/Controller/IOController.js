@@ -1,53 +1,103 @@
 export default class IOController {
-
-
     #io;
-    #clients;
-    #timers;
+    #players;
+    #moves;
+    #nbmoves;
 
-    constructor(io){
-
+    constructor(io) {
         this.#io = io;
-        this.#clients = new Map();
-        this.#timers = new Map();
+        this.#players = [];
+        this.#moves = {};
+        this.#nbmoves = 0;
     }
-
 
     registerSocket(socket) {
-        console.log(`nouvelle connexion avec l'id ${socket.id}`);
-        this.setupListeners(socket);
+        console.log(`Connexion: ${socket.id}`);
 
-        socket.emit('ping');
-    }
+        if (this.#players.length < 2) {
+            this.#players.push(socket.id);
 
-    setupListeners(socket){
-        socket.on('pong', user => this.greetings(socket, user.name));
+            if (this.#players.length === 1) {
+                socket.emit('game-status', { status: 'waiting', message: 'En attente d un second joueur...' });
+            } else {
+                this.#io.emit('game-status', { status: 'ready', message: ' deux joueurs sont connectés, vous pouvez jouer !' });
+            }
+        } else {
+            socket.emit('game-status', { status: 'rejected', message: ' la partie est pleine (2 joueurs max)' });
+            socket.disconnect();
+            return;
+        }
+
         socket.on('disconnect', () => this.leave(socket));
+        socket.on('player-move', (move) => this.handleMove(socket, move));
+        socket.on('restart-game', () => this.restartGame(socket));
     }
 
-    greetings(socket, userName) {
-        console.log(`Greetings from user: ${userName} (socket: ${socket.id})`);
-        this.#clients.set(socket.id, userName);
-        
-        socket.emit('welcome', { message: `Bienvenue ${userName}!` });
-        
-        socket.broadcast.emit('user-connected', { userName });
-        
-        const connectedUsers = Array.from(this.#clients.values());
-        this.#io.emit('users-list', { users: connectedUsers });
-    }
-
-
-    
     leave(socket) {
-        const userName = this.#clients.get(socket.id) || 'unknown';
-        console.log(`deconnexion du socket ${socket.id} (user : ${userName})`);
+        console.log(`Déconnexion: ${socket.id}`);
         
-        socket.broadcast.emit('user-disconnected', { userName });
-        
-        this.#clients.delete(socket.id);
+        this.#players = this.#players.filter(id => id !== socket.id);
+        this.#moves = {};
+        this.#nbmoves = 0;
 
-        clearInterval(this.#timers.get(socket.id));
-        this.#timers.delete(socket.id);
+        if (this.#players.length > 0) {
+            this.#io.emit('game-status', { status: 'waiting', message: 'L autre joueur s est déconnecté. En attente d un nouveau joueur...' });
+        }
+    }
+
+    handleMove(socket, move) {
+        if (this.#players.length !== 2) {
+            socket.emit('error', 'Pas assez de joueurs');
+            return;
+        }
+
+        this.#moves[socket.id] = move;
+        this.#nbmoves++;
+
+        if (this.#nbmoves === 1) {
+            // 1er joueur a jouer
+            socket.emit('game-status', { status: 'waiting-opponent', message: 'Vous avez joué. En attente de l adversaire...' });
+        } else if (this.#nbmoves === 2) {
+            // les deux ont jouert
+            this.computeResult();
+        }
+    }
+
+    computeResult() {
+        const joueur1 = this.#players[0];
+        const joueur2 = this.#players[1];
+
+        const move1 = this.#moves[joueur1];
+        const move2 = this.#moves[joueur2];
+
+        let result;
+
+        if (move1 === move2) {
+            result = 'draw';
+        } else if (
+            (move1 === 'pierre' && move2 === 'ciseaux') ||
+            (move1 === 'feuille' && move2 === 'pierre') ||
+            (move1 === 'ciseaux' && move2 === 'feuille')
+        ) {
+            result = 'player1-wins';
+        } else {
+            result = 'player2-wins';
+        }
+
+        this.#io.emit('round-result', {
+            result: result,
+            player1Move: move1,
+            player2Move: move2
+        });
+
+        this.#moves = {};
+        this.#nbmoves = 0;
+    }
+
+    restartGame(socket) {
+        console.log(` Relancer la partie demandé par ${socket.id}`);
+        this.#moves = {};
+        this.#nbmoves = 0;
+        this.#io.emit('game-status', { status: 'ready', message: ' goo jouer' });
     }
 }
