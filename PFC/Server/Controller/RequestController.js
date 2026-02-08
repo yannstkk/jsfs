@@ -1,7 +1,7 @@
 import {URL} from 'url';
 import Default from '../reponses/Default.js';
 import About from '../reponses/About.js';
-import pfc from '../reponses/About.js';
+import pfc from '../reponses/pfc.js';
 import NotFoundResponse from '../reponses/NotFoundResponse.js';
 
 
@@ -39,4 +39,18 @@ export default class RequestController {
       }
 
   }
+
+  serveStaticFile() {
+    const filePath = path.join(__dirname, '..', this.#url.pathname);
+    fs.readFile(filePath, (err, data) => {
+        if (err) {
+            this.#response.statusCode = 404;
+            this.#response.end('File not found');
+            return;
+        }
+        const contentType = mimeTypes[ext] || 'application/octet-stream';
+        this.#response.setHeader('Content-Type', contentType);
+        this.#response.end(data);
+    });
+}
 }

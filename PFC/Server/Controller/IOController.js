@@ -1,5 +1,3 @@
-
-
 export default class IOController {
 
 
@@ -23,15 +21,29 @@ export default class IOController {
     }
 
     setupListeners(socket){
-        socket.on('pong', user => this.greatings(socket, user.name));
+        socket.on('pong', user => this.greetings(socket, user.name));
         socket.on('disconnect', () => this.leave(socket));
     }
 
-   
+    greetings(socket, userName) {
+        console.log(`Greetings from user: ${userName} (socket: ${socket.id})`);
+        this.#clients.set(socket.id, userName);
+        
+        socket.emit('welcome', { message: `Bienvenue ${userName}!` });
+        
+        socket.broadcast.emit('user-connected', { userName });
+        
+        const connectedUsers = Array.from(this.#clients.values());
+        this.#io.emit('users-list', { users: connectedUsers });
+    }
 
     leave(socket) {
-        const userName = this.#clients.get(socket.id)|| 'unknown';
-        console.log(`deconnetion du socket ${socket.id} (user : ${userName})`);
+        const userName = this.#clients.get(socket.id) || 'unknown';
+        console.log(`deconnexion du socket ${socket.id} (user : ${userName})`);
+        
+        // Informer les autres utilisateurs
+        socket.broadcast.emit('user-disconnected', { userName });
+        
         this.#clients.delete(socket.id);
 
         clearInterval(this.#timers.get(socket.id));
