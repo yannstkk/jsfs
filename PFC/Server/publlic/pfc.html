@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pierre-Feuille-Ciseaux - Jeu</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+
+<body>
+    <div class="container">
+        <h1>jouez a pierre feuille ciseaux !</h1>
+        
+        <div id="game-container">
+            <div id="status">en attente d'un deuxieme joueur...</div>
+
+
+            <div id="moves" style="display: none;">
+                <!-- Les boutons seront ajoutés par JavaScript apres ... -->
+            </div>
+
+
+            <div id="result"></div>
+            <div id="restart" style="display: none;">
+                <button id="restart-btn">jouer une nouvelle partie</button>
+            </div>
+        </div>
+        
+        <nav class="nav-menu">
+            <a href="/" class="btn"> retour a l'accueil</a>
+        </nav>
+    </div>
+    
+    <!-- Socket.IO et script client à ajouter plus tard -->
+    <!-- <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <script src="app.js"></script> -->
+</body>
+
+
+
+
+</html>

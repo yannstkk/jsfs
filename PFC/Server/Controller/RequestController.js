@@ -1,56 +1,56 @@
-import {URL} from 'url';
-import Default from '../reponses/Default.js';
-import About from '../reponses/About.js';
-import pfc from '../reponses/pfc.js';
-import NotFoundResponse from '../reponses/NotFoundResponse.js';
-
-
+import { URL } from 'url';
+import fs from 'fs';
 
 export default class RequestController {
+    #request;
+    #response;
+    #url;
 
+    constructor(request, response) {
+        this.#request = request;
+        this.#response = response;
+        this.#url = new URL(request.url, `http://${request.headers.host}`);
+    }
 
+    handleRequest() {
+        const pathname = this.#url.pathname;
+        let filePath = null;
+        let contentType = 'text/html';
 
-  #request;
-  #response;
-  #url;
-
-
-
-  constructor(request, response) {
-
-    this.#request = request;
-    this.#response = response;
-    this.#url = new URL(request.url, `http://${request.headers.host}`);
-
-  }
-
-  handleRequest() {
-
-
-
-      if (this.#url.pathname === '/') {
-        new Default(this.#request, this.#response, this.#url).build();
-      } else if (this.#url.pathname === '/About') {
-        new About(this.#request, this.#response, this.#url).build();
-      } else if (this.#url.pathname === '/pfc') {
-        new pfc(this.#request, this.#response, this.#url).build();
-      } else {
-        new NotFoundResponse(this.#request, this.#response, this.#url).build();
-      }
-
-  }
-
-  serveStaticFile() {
-    const filePath = path.join(__dirname, '..', this.#url.pathname);
-    fs.readFile(filePath, (err, data) => {
-        if (err) {
-            this.#response.statusCode = 404;
-            this.#response.end('File not found');
-            return;
+        if (pathname === '/' || pathname === '/index.html') {
+            filePath = './public/index.html';
+        } else if (pathname === '/about' || pathname === '/about.html') {
+            filePath = './public/about.html';
+        } else if (pathname === '/pfc' || pathname === '/pfc.html') {
+            filePath = './public/pfc.html';
+        } else if (pathname.endsWith('.css')) {
+            filePath = `./public${pathname}`;
+            contentType = 'text/css';
+        } else if (pathname.endsWith('.js')) {
+            filePath = `./public${pathname}`;
+            contentType = 'application/javascript';
+        } else if (pathname.endsWith('.png') || pathname.endsWith('.jpg')) {
+            filePath = `./public${pathname}`;
+            contentType = pathname.endsWith('.png') ? 'image/png' : 'image/jpeg';
         }
-        const contentType = mimeTypes[ext] || 'application/octet-stream';
-        this.#response.setHeader('Content-Type', contentType);
-        this.#response.end(data);
-    });
-}
+
+
+
+
+
+        if (filePath) {
+            fs.readFile(filePath, (err, data) => {
+                if (err) {
+                    this.#response.writeHead(404, { 'Content-Type': 'text/html' });
+                    this.#response.end('<h1>404 - Page non trouvée</h1>');
+                } else {
+                    this.#response.writeHead(200, { 'Content-Type': contentType });
+                    this.#response.end(data);
+                }
+            });
+        } else {
+            this.#response.writeHead(404, { 'Content-Type': 'text/html' });
+            this.#response.end('<h1>404 - Page non trouvée</h1>');
+        }
+    }
 }
