@@ -36,7 +36,7 @@ class UI {
         this.btnCiseaux.disabled = true;
     }
 
-    showResult(result, player1Move, player2Move) {
+    showResult(result, playerMove, opponentMove, playerNumber) {
         this.movesButtonsDiv.style.display = 'none';
         this.resultDiv.style.display = 'block';
         this.restartContainer.style.display = 'block';
@@ -44,15 +44,22 @@ class UI {
         let message = '';
         let className = '';
 
-        if (result === 'player1-wins') {
-            message = `Vous avez GAGNÉ !<br>Vous: ${this.getMoveEmoji(player1Move)} vs Adversaire: ${this.getMoveEmoji(player2Move)}`;
-            className = 'result-win';
-        } else if (result === 'player2-wins') {
-            message = `Vous avez PERDU<br>Vous: ${this.getMoveEmoji(player1Move)} vs Adversaire: ${this.getMoveEmoji(player2Move)}`;
-            className = 'result-lose';
-        } else if (result === 'draw') {
-            message = `ÉGALITÉ !<br>Vous deux: ${this.getMoveEmoji(player1Move)}`;
+        let hasWon = false;
+        let hasLost = false;
+
+        if (result === 'draw') {
+            message = `ÉGALITÉ !<br>Vous deux : ${this.getMoveEmoji(playerMove)}`;
             className = 'result-draw';
+        } else if (
+            (result === 'player1-wins' && playerNumber === 1) ||
+            (result === 'player2-wins' && playerNumber === 2)
+        ) {
+            message = `Vous avez GAGNÉ !<br>Vous : ${this.getMoveEmoji(playerMove)} vs Adversaire : ${this.getMoveEmoji(opponentMove)}`;
+            className = 'result-win';
+        } else {
+            // Le joueur actuel a perdu
+            message = `Vous avez PERDU <br>Vous : ${this.getMoveEmoji(playerMove)} vs Adversaire : ${this.getMoveEmoji(opponentMove)}`;
+            className = 'result-lose';
         }
 
         this.resultDiv.innerHTML = message;

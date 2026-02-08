@@ -7,17 +7,23 @@ class Game {
         this.socket = io();
         this.ui = new UI();
         this.gameStatus = null;
+        this.playerNumber = null; 
 
         this.setupSocketListeners();
     }
 
     setupSocketListeners() {
         this.socket.on('connect', () => {
-            console.log('Connecté au serveur');
+            console.log('connecté au serveur');
         });
 
         this.socket.on(GAME_MESSAGES.GAME_STATUS, (data) => {
             this.gameStatus = data.status;
+            
+            if (data.playerNumber) {
+                this.playerNumber = data.playerNumber;
+                console.log(`vous etes le joueur ${this.playerNumber}`);
+            }
 
             if (data.status === GAME_STATUSES.WAITING) {
                 this.ui.showStatus(data.message);
@@ -37,8 +43,9 @@ class Game {
         this.socket.on(GAME_MESSAGES.ROUND_RESULT, (data) => {
             this.ui.showResult(
                 data.result,
-                data.player1Move,
-                data.player2Move
+                data.playerMove,
+                data.opponentMove,
+                data.playerNumber // Passer le numéro de joueur a l ui
             );
             this.ui.showRestartButton(() => this.restartGame());
         });

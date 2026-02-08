@@ -42,7 +42,7 @@ export default class RequestController {
             fs.readFile(filePath, (err, data) => {
                 if (err) {
                     this.#response.writeHead(404, { 'Content-Type': 'text/html' });
-                    this.#response.end('<h1>404 - Page non trouvée</h1>');
+                    this.#response.end('<h1>404 page non trouvee</h1>');
                 } else {
                     this.#response.writeHead(200, { 'Content-Type': contentType });
                     this.#response.end(data);
@@ -50,7 +50,7 @@ export default class RequestController {
             });
         } else {
             this.#response.writeHead(404, { 'Content-Type': 'text/html' });
-            this.#response.end('<h1>404 - Page non trouvée</h1>');
+            this.#response.end('<h1>404 page non trouvee</h1>');
         }
     }
 }
