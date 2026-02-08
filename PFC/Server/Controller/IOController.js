@@ -46,22 +46,33 @@ export default class IOController {
     }
 
     handleMove(socket, move) {
-        if (this.#players.length !== 2) {
-            socket.emit('error', 'Pas assez de joueurs');
-            return;
-        }
-
-        this.#moves[socket.id] = move;
-        this.#nbmoves++;
-
-        if (this.#nbmoves === 1) {
-            // 1er joueur a jouer
-            socket.emit('game-status', { status: 'waiting-opponent', message: 'Vous avez joué. En attente de l adversaire...' });
-        } else if (this.#nbmoves === 2) {
-            // les deux ont jouert
-            this.computeResult();
-        }
+    if (this.#players.length !== 2) {
+        socket.emit('error', 'Pas assez de joueurs');
+        return;
     }
+
+    // Empêcher un joueur de jouer 2 fois dans la même manche
+    if (this.#moves[socket.id]) {
+        socket.emit('game-status', {
+            status: 'waiting-opponent',
+            message: 'Vous avez déjà joué. En attente de l adversaire...'
+        });
+        return;
+    }
+
+    this.#moves[socket.id] = move;
+
+    const nbJoueursAyantJoue = Object.keys(this.#moves).length;
+
+    if (nbJoueursAyantJoue === 1) {
+        socket.emit('game-status', {
+            status: 'waiting-opponent',
+            message: 'Vous avez joué. En attente de l adversaire...'
+        });
+    } else if (nbJoueursAyantJoue === 2) {
+        this.computeResult();
+    }
+}
 
     computeResult() {
         const joueur1 = this.#players[0];
