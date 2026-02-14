@@ -1,15 +1,13 @@
 {
-  "name": "chartio",
+  "name": "tp2-socketio-chartjs",
   "version": "1.0.0",
-  "description": "prise en main de socket.io avec Chart.js",
-  "type": "module",
+  "description": "Serveur Node.js avec Socket.io et Chart.js",
   "main": "main.js",
   "scripts": {
     "start": "node main.js"
   },
-  "author": "Jean-Christophe Routier",
-  "license": "ISC",
   "dependencies": {
-    "chartio": "^1.0.5"
+    "socket.io": "^4.7.2",
+    "chart.js": "^4.4.0"
   }
 }

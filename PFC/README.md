@@ -1,230 +1,168 @@
-# Pierre Feuille Ciseaux 
+# Pierre Feuille Ciseaux
 
-Jeu de Pierre Feuille Ciseaux en ligne pour **2 joueurs**, développé en Node.js avec Socket.IO. Un serveur HTTP maison sert les fichiers statiques et gère les connexions WebSocket en temps réel.
+Jeu en temps reel entre deux joueurs connectes depuis deux navigateurs differents.
+La partie se joue en 5 manches. Le joueur avec le plus de manches gagnees remporte la partie
+En cas d'egalite apres 5 manches, une manche decisive est jouee.
+
+Deux modes sont disponibles :
+- Joueur contre Joueur : deux personnes jouent depuis deux onglets ou navigateur different
+- Joueur contre IA : une seule personne joue contre un adversaire virtuel
 
 ---
 
-## Structure du projet
+## Architecture du projet
 
 ```
-PFC/
-├── Client/                  # Code source front-end
-│   ├── src/
-│   │   ├── index.js         # Point d'entrée Webpack (initialise le jeu)
-│   │   ├── Game.js          # Logique client : connexion socket, événements
-│   │   ├── UI.js            # Manipulation du DOM (boutons, résultats, statuts)
-│   │   ├── constants.js     # Constantes partagées (événements, statuts, coups)
-│   │   ├── index.html       # Page d'accueil
-│   │   ├── pfc.html         # Page de jeu (injectée par Webpack)
-│   │   ├── about.html       # Page "A propos"
-│   │   └── style.css        # Feuille de style
-│   ├── webpack.config.cjs   # Config Webpack : compile vers Server/public/
-│   └── package.json
+pfc/
+├── Server/
+│   ├── index.js
+│   ├── package.json
+│   ├── public/               <- fichiers servis au navigateur (generes par Webpack)
+│   └── Controller/
+│       ├── RequestController.js
+│       ├── IOController.js
+│       └── IAMode.js
 │
-└── Server/                  # Code source back-end
-    ├── index.js             # Serveur HTTP + initialisation Socket.IO
-    ├── Controller/
-    │   ├── RequestController.js  # Gestion des requêtes HTTP (routing des fichiers statiques)
-    │   └── IOController.js       # Gestion des connexions WebSocket et logique de jeu
-    └── package.json
+└── Client/
+    ├── package.json
+    ├── webpack.config.cjs
+    └── src/
+        ├── index.html
+        ├── pfc.html
+        ├── pfcia.html
+        ├── about.html
+        ├── style.css
+        ├── constants.js
+        ├── Game.js
+        ├── UI.js
+        ├── index.js
+        ├── AiIndex.js
+        └── images/
+            ├── pierre.png
+            ├── feuille.png
+            └── ciseaux.png
 ```
 
 ---
 
-## Prérequis
+## Prerequis
 
-- **Node.js** v18 ou supérieur
-- **npm** (inclus avec Node.js)
-
-Vérifier les versions installées :
-
-```bash
-node --version
-npm --version
-```
+- Node.js version 18 ou superieure
+- npm
 
 ---
 
 ## Installation
 
-Le projet comporte deux parties indépendantes à installer séparément : le **Client** et le **Serveur**.
+L'installation se fait en deux etapes :
 
-### 1. Installer les dépendances du Serveur
+### 1. Installer les dependances du serveur
 
-```bash
-cd PFC/Server
+```
+cd Server
 npm install
 ```
 
-### 2. Installer les dépendances du Client
+### 2. Installer les dependances du client
 
-```bash
-cd PFC/Client
+```
+cd Client
 npm install
 ```
 
----
 
-## Build du Client (compilation Webpack)
 
-Le client doit être compilé avec Webpack **avant** de lancer le serveur. Le résultat est déposé directement dans `Server/public/`, qui est le dossier servi par le serveur HTTP.
+## Compiler le code client avec Webpack
 
-### Build unique (production)
+Webpack prend les fichiers sources du dossier `Client/src/` et les compile dans `Server/public/`.
+Cette etape est obligatoire avant de lancer le serveur.
 
-```bash
-cd PFC/Client
+Depuis le dossier `Client/` :
+
+```
 npx webpack
 ```
 
-### Mode développement avec rechargement automatique
 
-```bash
-cd PFC/Client
-node index.js
-```
-
-> **Note :** En mode `dev`, Webpack surveille les fichiers sources et recompile automatiquement à chaque modification. Laisser ce processus tourner dans un terminal dédié pendant le développement.
-
-Après le build, le dossier `PFC/Server/public/` doit contenir :
+Apres cette etape, le dossier `Server/public/` doit contenir les fichiers suivants :
 
 ```
 Server/public/
-├── app.js          ← bundle JS compilé (socket.io-client inclus)
-├── index.html      ← page d'accueil
-├── pfc.html        ← page de jeu (avec <script> injecté par HtmlWebpackPlugin)
-├── about.html      ← page "À propos"
-└── style.css       ← feuille de style
+├── index.html
+├── pfc.html
+├── pfcia.html
+├── about.html
+├── style.css
+├── app.js
+├── app-ai.js
+└── images/
+    ├── pierre.png
+    ├── feuille.png
+    └── ciseaux.png
 ```
 
 ---
 
-## Lancement du Serveur
+## Lancer le serveur
 
-```bash
-cd PFC/Server
-npm start
-```
-
-Le serveur démarre sur le port **8080**. La console affiche :
+Depuis le dossier `Server/` :
 
 ```
-(aucun message de démarrage explicite — le serveur écoute silencieusement)
+npm run start 
+
+ou
+
+node index.js
 ```
 
-> Le serveur tourne en `http://localhost:8080`.
+Le serveur demarre sur le port 8080. Il n'affiche pas de message au demarrage.
 
 ---
 
-## Comment jouer
+## Jouer
 
-### Étape 1 — Ouvrir le jeu dans deux navigateurs
-
-Le jeu nécessite **exactement 2 joueurs** connectés simultanément.
-
-- Ouvrir **deux fenêtres/onglets** (ou deux navigateurs différents) à l'adresse :
+Ouvrez un navigateur et allez a l'adresse :
 
 ```
 http://localhost:8080
 ```
 
-> Pour tester en réseau local, remplacer `localhost` par l'adresse IP de la machine hôte (ex. `http://192.168.1.10:8080`). Les deux joueurs doivent être sur le même réseau.
+La page d'accueil propose deux modes de jeu.
 
-### Étape 2 — Accéder à la page de jeu
+### Mode Joueur contre Joueur
 
-Depuis la page d'accueil, cliquer sur **« Jouer »** pour accéder à :
+1. Cliquez sur "Joueur vs Joueur" depuis la page d'accueil, ou allez directement a `http://localhost:8080/pfc`
+2. Ouvrez un deuxieme onglet ou une deuxieme fenetre et allez a la meme adresse
+3. Le premier joueur voit le message "En attente d'un second joueur"
+4. Des que le deuxieme joueur se connecte, les deux voient "Les deux joueurs sont connectes"
+5. Chaque joueur clique sur Pierre, Feuille ou Ciseaux pour jouer son coup
+6. Le premier a jouer voit "En attente de l'adversaire"
+7. Quand les deux ont joue, le resultat de la manche s'affiche avec les deux coups et le score mis a jour
+8. L'un des deux joueurs clique sur "Manche suivante" pour lancer la manche suivante pour les deux
+9. Apres 5 manches, le vainqueur est annonce. En cas d'egalite, une manche decisive est jouee
+10. Cliquez sur "Nouvelle partie" pour recommencer depuis zero
 
-```
-http://localhost:8080/pfc
-```
+Si un joueur se deconnecte en cours de partie, l'autre joueur est informe et les scores sont reinitialises.
+Un troisieme joueur qui tenterait de se connecter serait refuse.
 
-Faire de même dans la deuxième fenêtre.
+### Mode Joueur contre IA
 
-### Étape 3 — Attendre le second joueur
-
-Le **premier joueur** à se connecter voit le message :
-
-```
-En attente d'un second joueur...
-```
-
-Les boutons de jeu sont désactivés.
-
-### Étape 4 — La partie commence
-
-Dès que le **second joueur** rejoint la page `/pfc`, les deux joueurs voient :
-
-```
-Les deux joueurs sont connectés, vous pouvez jouer !
-```
-
-Les trois boutons s'activent : ** Pierre**, ** Feuille**, ** Ciseaux**.
-
-### Étape 5 — Jouer un coup
-
-Chaque joueur clique sur son coup. Le premier à jouer voit :
-
-```
-Vous avez joué. En attente de l'adversaire...
-```
-
-Les boutons sont désactivés jusqu'à ce que l'adversaire joue.
-
-### Étape 6 — Résultat
-
-Dès que les deux joueurs ont joué, le résultat s'affiche pour chacun :
-
-| Situation | Message affiché |
-|-----------|----------------|
-| Victoire | `Vous avez gagne  Vous : ... vs Adversaire : ....` |
-| Défaite  | `Vous avez perdu  Vous : ... vs Adversaire : ...` |
-| Égalité  | `egalité  Vous deux : .... ` |
-
-### Étape 7 — Rejouer
-
-Cliquer sur **« Jouer une nouvelle partie »** pour réinitialiser et lancer un nouveau round.
-
----
-
-## Comportement en cas de déconnexion
-
-Si l'un des joueurs ferme son onglet ou se déconnecte, l'autre joueur voit :
-
-```
-L'autre joueur s'est déconnecté. En attente d'un nouveau joueur...
-```
-
-La partie est suspendue jusqu'à qu'un nouveau joueur rejoigne `/pfc`.
-
-> **Limite :** Le serveur n'accepte que 2 joueurs simultanément. Toute connexion supplémentaire reçoit le message `La partie est pleine (2 joueurs max)` et est immédiatement déconnectée.
+1. Cliquez sur "Joueur vs IA" depuis la page d'accueil, ou allez directement a `http://localhost:8080/pfcia`
+2. La partie commence immediatement, sans attendre un second joueur
+3. Jouez votre coup en cliquant sur Pierre, Feuille ou Ciseaux
+4. L'IA joue apres un court delai
+5. Le resultat s'affiche, puis cliquez sur "Manche suivante" pour continuer
+6. Les regles des 5 manches s'appliquent de la meme facon
 
 ---
 
 ## Pages disponibles
 
-| URL | Description |
-|-----|-------------|
-| `http://localhost:8080/` | Page d'accueil |
-| `http://localhost:8080/pfc` | Page de jeu |
-| `http://localhost:8080/about` | Page "À propos" |
-
-
-
-## Événements Socket.IO
-
-### Serveur → Client
-
-| Événement | Données | Description |
-|-----------|---------|-------------|
-| `game-status` | `{ status, message, playerNumber }` | Mise à jour de l'état de la partie |
-| `round-result` | `{ result, playerMove, opponentMove, playerNumber }` | Résultat du round |
-| `error` | `string` | Message d'erreur |
-
-### Client → Serveur
-
-| Événement | Données | Description |
-|-----------|---------|-------------|
-| `player-move` | `'pierre'` \| `'feuille'` \| `'ciseaux'` | Coup joué par le joueur |
-| `restart-game` | *(aucune)* | Demande de nouvelle partie |
+| Adresse                      | Description              |
+|------------------------------|--------------------------|
+| http://localhost:8080        | Page d'accueil           |
+| http://localhost:8080/pfc    | Jeu Joueur contre Joueur |
+| http://localhost:8080/pfcia  | Jeu Joueur contre IA     |
+| http://localhost:8080/about  | A propos                 |
 
 ---
-

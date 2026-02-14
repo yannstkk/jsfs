@@ -1,151 +1,194 @@
+const MAX_ROUNDS = 5;
+
 export default class IOController {
     #io;
-    #players;
-    #moves;
+    #players  = [];
+    #moves    = {};
+    #scores   = { 1: 0, 2: 0 };
+    #round    = 1;
+    #gameOver = false;
 
     constructor(io) {
         this.#io = io;
-        this.#players = [];
-        this.#moves = {};
     }
 
     registerSocket(socket) {
         console.log(`Connexion: ${socket.id}`);
 
-        if (this.#players.length < 2) {
-            this.#players.push(socket.id);
-            
-            // Assigner le numéro de joueur
-            const playerNumber = this.#players.length;
-            socket.playerNumber = playerNumber;
-
-            if (this.#players.length === 1) {
-                socket.emit('game-status', { 
-                    status: 'waiting', 
-                    message: 'En attente d\'un second joueur...',
-                    playerNumber: playerNumber
-                });
-            } else {
-                // Envoyer à chaque joueur son numéro
-                this.#io.to(this.#players[0]).emit('game-status', { 
-                    status: 'ready', 
-                    message: 'Les deux joueurs sont connectés, vous pouvez jouer !',
-                    playerNumber: 1
-                });
-                this.#io.to(this.#players[1]).emit('game-status', { 
-                    status: 'ready', 
-                    message: 'Les deux joueurs sont connectés, vous pouvez jouer !',
-                    playerNumber: 2
-                });
-            }
-        } else {
-            socket.emit('game-status', { 
-                status: 'rejected', 
-                message: 'La partie est pleine (2 joueurs max)' 
-            });
+        if (this.#players.length >= 2) {
+            socket.emit('game-status', { status: 'rejected', message: 'Partie pleine.' });
             socket.disconnect();
             return;
         }
 
-        socket.on('disconnect', () => this.leave(socket));
-        socket.on('player-move', (move) => this.handleMove(socket, move));
-        socket.on('restart-game', () => this.restartGame(socket));
-    }
+        this.#players.push(socket.id);
+        const playerNumber = this.#players.length;
 
-    leave(socket) {
-        console.log(`Déconnexion: ${socket.id}`);
-        
-        this.#players = this.#players.filter(id => id !== socket.id);
-        this.#moves = {};
-
-        if (this.#players.length > 0) {
-            this.#io.emit('game-status', { 
-                status: 'waiting', 
-                message: 'L\'autre joueur s\'est déconnecté. En attente d\'un nouveau joueur...' 
-            });
-        }
-    }
-
-    handleMove(socket, move) {
-        if (this.#players.length !== 2) {
-            socket.emit('error', 'Pas assez de joueurs');
-            return;
-        }
-
-        // Empêcher un joueur de jouer 2 fois dans la même manche
-        if (this.#moves[socket.id]) {
+        if (this.#players.length === 1) {
             socket.emit('game-status', {
-                status: 'waiting-opponent',
-                message: 'Vous avez déjà joué. En attente de l\'adversaire...'
+                status: 'waiting',
+                message: "En attente d'un second joueur...",
+                playerNumber,
+                ...this.#scoreData()
             });
-            return;
+        } else {
+            this.#emitReady("Les deux joueurs sont connectes. A vous de jouer !");
         }
+
+        socket.on('player-move',  (move) => this.#handleMove(socket, move));
+        socket.on('restart-game', ()     => this.#handleRestart(socket));
+        socket.on('disconnect',   ()     => this.#leave(socket));
+    }
+
+    #handleMove(socket, move) {
+        if (this.#gameOver) return;
+        if (this.#players.length !== 2) { socket.emit('error', 'Pas assez de joueur'); return; }
 
         this.#moves[socket.id] = move;
 
-        const nbJoueursAyantJoue = Object.keys(this.#moves).length;
-
-        if (nbJoueursAyantJoue === 1) {
+        if (Object.keys(this.#moves).length === 1) {
             socket.emit('game-status', {
                 status: 'waiting-opponent',
-                message: 'Vous avez joué. En attente de l adversaire...'
+                message: "En attente de l'adversaire...",
+                ...this.#scoreData()
             });
-        } else if (nbJoueursAyantJoue === 2) {
-            this.computeResult();
-        }
-    }
-
-    computeResult() {
-        const joueur1 = this.#players[0];
-        const joueur2 = this.#players[1];
-
-        const move1 = this.#moves[joueur1];
-        const move2 = this.#moves[joueur2];
-
-        let result;
-
-        if (move1 === move2) {
-            result = 'draw';
-        } else if (
-            (move1 === 'pierre' && move2 === 'ciseaux') ||
-            (move1 === 'feuille' && move2 === 'pierre') ||
-            (move1 === 'ciseaux' && move2 === 'feuille')
-        ) {
-            result = 'player1-wins';
         } else {
-            result = 'player2-wins';
+            this.#computeResult();
         }
-
-        this.#io.to(joueur1).emit('round-result', {
-            result: result,
-            playerMove: move1,
-            opponentMove: move2,
-            playerNumber: 1
-        });
-
-        this.#io.to(joueur2).emit('round-result', {
-            result: result,
-            playerMove: move2,
-            opponentMove: move1,
-            playerNumber: 2
-        });
-
-        this.#moves = {};
     }
 
-    restartGame(socket) {
-        console.log(`relancer la partie demandé par ${socket.id}`);
-        this.#moves = {};
-        
-        this.#io.to(this.#players[0]).emit('game-status', { 
-            status: 'ready', 
-            message: 'Cest a toi de jouer',
-            playerNumber: 1
+    #computeResult() {
+    const id1 = this.#players[0];
+    const id2 = this.#players[1];
+    const m1 = this.#moves[id1];
+    const m2 = this.#moves[id2];
+    this.#moves = {};
+
+    const result = this.#getResult(m1, m2);
+    if (result === 'player1-wins') {
+        this.#scores[1]++;
+    }
+    if (result === 'player2-wins') {
+        this.#scores[2]++;
+    }
+
+    const scoreData = this.#scoreData();
+
+    this.#io.to(id1).emit('round-result', {
+        result: result,
+        playerMove: m1,
+        opponentMove: m2,
+        score1: scoreData.score1,
+        score2: scoreData.score2,
+        round: scoreData.round
+    });
+
+    this.#io.to(id2).emit('round-result', {
+        result: result,
+        playerMove: m2,
+        opponentMove: m1,
+        score1: scoreData.score1,
+        score2: scoreData.score2,
+        round: scoreData.round
+    });
+
+    if (this.#round >= MAX_ROUNDS && this.#scores[1] !== this.#scores[2]) {
+        this.#gameOver = true;
+        let winner = 1;
+        if (this.#scores[2] > this.#scores[1]) {
+            winner = 2;
+        }
+        this.#io.to(id1).emit('game-over', {
+            winner: winner,
+            score1: scoreData.score1,
+            score2: scoreData.score2,
+            round: scoreData.round
         });
-        this.#io.to(this.#players[1]).emit('game-status', { 
-            status: 'ready', 
-            message: 'Cest a toi de jouer',
-            playerNumber: 2
+        this.#io.to(id2).emit('game-over', {
+            winner: winner,
+            score1: scoreData.score1,
+            score2: scoreData.score2,
+            round: scoreData.round
         });
+    } else {
+        this.#round++;
+    }
+}
+
+  
+    #handleRestart(socket) {
+    if (this.#gameOver) {
+        this.#scores = { 1: 0, 2: 0 };
+        this.#round = 1;
+        this.#gameOver = false;
+    }
+    this.#moves = {};
+    this.#emitReady("A vous de jouer !");
+}
+
+#leave(socket) {
+    const newPlayers = [];
+    for (let i = 0; i < this.#players.length; i++) {
+        if (this.#players[i] !== socket.id) {
+            newPlayers.push(this.#players[i]);
+        }
+    }
+    this.#players = newPlayers;
+
+    this.#moves = {};
+    this.#scores = { 1: 0, 2: 0 };
+    this.#round = 1;
+    this.#gameOver = false;
+
+    if (this.#players.length > 0) {
+        const scoreData = this.#scoreData();
+        this.#io.to(this.#players[0]).emit('game-status', {
+            status: 'waiting',
+            message: "L'autre joueur s'est deconnecte.",
+            playerNumber: 1,
+            score1: scoreData.score1,
+            score2: scoreData.score2,
+            round: scoreData.round
+        });
+    }
+}
+
+#emitReady(message) {
+    const id1 = this.#players[0];
+    const id2 = this.#players[1];
+    const scoreData = this.#scoreData();
+
+    if (id1) {
+        this.#io.to(id1).emit('game-status', {
+            status: 'ready',
+            message: message,
+            playerNumber: 1,
+            score1: scoreData.score1,
+            score2: scoreData.score2,
+            round: scoreData.round
+        });
+    }
+    if (id2) {
+        this.#io.to(id2).emit('game-status', {
+            status: 'ready',
+            message: message,
+            playerNumber: 2,
+            score1: scoreData.score1,
+            score2: scoreData.score2,
+            round: scoreData.round
+        });
+    }
+}
+
+    #getResult(m1, m2) {
+        if (m1 === m2) return 'draw';
+        if ((m1 === 'pierre' && m2 === 'ciseaux') ||
+            (m1 === 'feuille' && m2 === 'pierre')  ||
+            (m1 === 'ciseaux' && m2 === 'feuille')) return 'player1-wins';
+        return 'player2-wins';
+    }
+
+    #scoreData() {
+        return { score1: this.#scores[1], score2: this.#scores[2], round: this.#round };
     }
 }

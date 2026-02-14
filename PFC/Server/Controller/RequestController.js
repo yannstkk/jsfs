@@ -32,6 +32,8 @@ export default class RequestController {
         } else if (pathname.endsWith('.png') || pathname.endsWith('.jpg')) {
             filePath = `./public${pathname}`;
             contentType = pathname.endsWith('.png') ? 'image/png' : 'image/jpeg';
+        } else if (pathname === '/pfcia' || pathname === '/pfcia.html') {
+            filePath = './public/pfcia.html';
         }
 
 

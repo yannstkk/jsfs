@@ -1,56 +1,65 @@
-import * as fs from 'fs/promises';
+const fs   = require('fs').promises;
+const path = require('path');
+const contentTypeUtil = require('../scripts/contentTypeUtil');
 
-import { getContentTypeFrom }  from '../scripts/contentTypeUtil.js';
+const PUBLIC_FOLDER = path.join(__dirname, '..', 'public');
 
-const BASE = 'http://localhost/';
-/**
-*  define a controller to retrieve static resources
-*/
-export default class RequestController {
+class RequestController {
 
-  #request;
-  #response;
-  #url;
+    #request;
+    #response;
+    #url;
 
-  constructor(request, response) {
-    this.#request = request,
-    this.#response = response;
-    this.#url = new URL(this.request.url,BASE).pathname;   // on ne considère que le "pathname" de l'URL de la requête
-  }
+    constructor(request, response) {
+        this.#request  = request;
+        this.#response = response;
 
-  get response() {
-    return this.#response;
-  }
-  get request() {
-    return this.#request;
-  }
-  get url() {
-    return this.#url;
-  }
-
-  async handleRequest() {
-    this.response.setHeader("Content-Type" , getContentTypeFrom(this.url) );
-    await this.buildResponse();
-    this.response.end();
-  }
-
-  /**
-  * send the requested resource as it is, if it exists, else responds with a 404
-  */
-  async buildResponse()  {
-    try {
-      // check if resource is available
-      await fs.access(`.${this.url}`);
-      // read the requested resource content
-      const data = await fs.readFile(`.${this.url}`);
-      // send resource content
-      this.response.statusCode = 200;
-      this.response.write(data);
+        var parsed = new URL(request.url, 'http://localhost');
+        this.#url = parsed.pathname;
     }
-    catch(err) { // resource is not available
-      this.response.statusCode = 404;
-      this.response.write('erreur');
-    }
-  }
 
+    get request() {
+        return this.#request;
+    }
+
+    get response() {
+        return this.#response;
+    }
+
+    get url() {
+        return this.#url;
+    }
+
+    async handle() {
+        var urlToServe = this.#url;
+        if (urlToServe === '/') {
+            urlToServe = '/chartio.html';
+        }
+
+        var filePath = path.join(PUBLIC_FOLDER, urlToServe);
+
+        var resolvedFile = path.resolve(filePath);
+        var resolvedPublic = path.resolve(PUBLIC_FOLDER);
+
+        if (!resolvedFile.startsWith(resolvedPublic)) {
+            this.#response.writeHead(403, { 'Content-Type': 'text/plain' });
+            this.#response.end('Acces interdit');
+            return;
+        }
+
+        try {
+            await fs.access(filePath);
+            var data = await fs.readFile(filePath);
+            var contentType = contentTypeUtil.getContentType(filePath);
+
+            this.#response.writeHead(200, { 'Content-Type': contentType });
+            this.#response.end(data);
+
+        } catch (error) {
+            this.#response.writeHead(404, { 'Content-Type': 'text/plain' });
+            this.#response.end('fichier non trouvee : ' + urlToServe);
+        }
+    }
 }
+
+module.exports = RequestController;
