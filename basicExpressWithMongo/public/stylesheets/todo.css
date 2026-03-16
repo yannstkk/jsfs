@@ -1,0 +1,39 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+#content , #list {
+    margin : 10px;
+    padding : 4px;
+    border : solid thin #999;
+}
+
+#content {
+  overflow : hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#createTask {
+  margin : auto;
+}
+
+#urgency {
+  width : 50px;
+  text-align : right;
+}
+
+#list div.task {
+  padding : 2px;
+  margin : 1px 2px;
+}
+div.task:nth-of-type(even) {
+  background-color: #EEE;
+}
+
+
+button.delete {
+  color : red;
+  margin-left : 10px;
+}
