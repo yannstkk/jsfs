@@ -1,0 +1,24 @@
+{
+	"title": "Dune",
+	"author": "Herbert F",
+	"cover": "/images/dune.jpg",
+	"year": 1965
+}
+{
+	"title": "The Name of the Wind",
+	"author": "Rothfuss P",
+	"cover": "/images/name_of_the_wind.jpg",
+	"year": 2007
+}
+{
+	"title": "The Lord of the Ring",
+	"author": "Tolkien JRR",
+	"cover": "/images/lotr.png",
+	"year": 1954
+}
+{
+	"title": "The Well of Ascension",
+	"author": "Sanderson B",
+	"cover": "/images/well_of_ascension.jpg",
+	"year": 2007
+}
