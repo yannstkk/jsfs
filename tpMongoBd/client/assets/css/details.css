@@ -1,0 +1,20 @@
+#details {
+   position: absolute;
+   left: 400px;
+   top: 100px;
+   width: 400px;
+   border: solid thin #CCC;
+   background-color: rgb(32, 32, 32);
+   color: white;
+   padding: 10px;
+}
+
+#details div.cover {
+   float: right;
+   margin: 3px;
+}
+
+#details div {
+   margin: 5px 15px;
+   padding: 5px;
+}

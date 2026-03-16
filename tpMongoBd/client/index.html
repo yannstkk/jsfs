@@ -2,14 +2,25 @@
 <html>
 
 <head>
-   <title>Introduction à mongodb</title>
-   <link rel="stylesheet" href="style/style.css" type="text/css">
+   <title>Introduction à Mongodb</title>
+   <link rel="stylesheet" href="stylesheets/style.css" type="text/css">
    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
 </head>
 
 <body>
    <h1>Introduction à MongoDb</h1>
+
+
+   <h2>Book list (avec React)</h2>
+   
+   <p>Le contenu de la page est générée par le client à partir de la réponse JSON reçue depuis
+      <code>http://127.0.0.1:3000/books</code> suite à une requête <code>fetch</code>.
+   </p>
+   <p>
+      Le code client est géré par <i>React</i> (avec les <em>hooks</em>), voir les composants dans <code>/client/components</code>.
+      Le composant principal est <code>BookApp</code>, c'est ce composant qui exécute la requête <code>fecth</code> à son chargement.
+   </p>
 
    <div id="insertReactHere"></div>
 </body>

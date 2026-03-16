@@ -3,7 +3,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+// connexion à la base de données
+const dbConnection = require('./controllers/db.controller.js');
+
 // define routers
+const booksRouter = require('./routes/books.route');
 
 // define middlewares
 const error = require('./middlewares/error.middleware');
@@ -22,6 +26,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // routes middlewares
+app.use('/books', booksRouter);
 
 // in all other cases use error middleware
 app.use(error);

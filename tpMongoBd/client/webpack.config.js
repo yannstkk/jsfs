@@ -51,7 +51,13 @@ module.exports = {
                noErrorOnMissing: true
             },
             {
-               context: path.resolve(__dirname, 'style'),
+               context: path.resolve(__dirname, 'javascripts'),
+               from: '*.js',
+               to: 'javascripts/[name][ext]',
+               noErrorOnMissing: true
+            },
+            {
+               context: path.resolve(__dirname, 'stylesheets'),
                from: '**/*',
                to: 'stylesheets/[name][ext]',
                noErrorOnMissing: true

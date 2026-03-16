@@ -1,0 +1,43 @@
+.booklist {
+   border: solid 2px #404040;
+   padding: 4px;
+}
+
+.book {
+   border: solid thin #404040;
+   background-color: #E0E0E0;
+}
+
+table {
+   border: black solid thin;
+}
+
+td {
+   background-color: lightgray;
+}
+
+.author,
+.title {
+   padding: 2px 5px;
+}
+
+.author {
+   color: green;
+}
+
+.cover {
+   width: 200px;
+   padding: 5px;
+   background-color: rgba(100, 155, 100, 0.5);
+}
+
+.cover img {
+   width: 100%;
+}
+
+footer {
+   border-top: solid thin #BBBBBB;
+   margin-top: 10px;
+   padding: 5px;
+}
+
