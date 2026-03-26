@@ -1,0 +1,21 @@
+{
+  "name": "sellyours",
+  "version": "1.0.0",
+  "description": "projet 2 jsfs",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "debug": "^4.3.4",
+    "express": "^4.18.2",
+    "http-errors": "^2.0.0",
+    "mongoose": "^8.0.3",
+    "pug": "^3.0.2"
+  }
+}
