@@ -5,10 +5,10 @@ const dbURI = require('../config/db.config').DB_URI;
 const dbConnection = mongoose.createConnection(dbURI);
 
 dbConnection.on('connected', () =>
-  console.log(`[DB] Connecté à ${dbURI}`)
+  console.log(`[DB] Connectee a ${dbURI}`)
 );
 dbConnection.on('disconnected', () =>
-  console.log(`[DB] Déconnecté de ${dbURI}`)
+  console.log(`[DB] Deconnectee de ${dbURI}`)
 );
 dbConnection.on('error', err =>
   console.log(`[DB] Erreur de connexion : ${err}`)
@@ -16,7 +16,7 @@ dbConnection.on('error', err =>
 
 const shutdown = async msg => {
   await dbConnection.close();
-  console.log(`[DB] Connexion fermée : ${msg}`);
+  console.log(`[DB] Connexion fermee : ${msg}`);
   process.exit(0);
 };
 
@@ -27,7 +27,7 @@ if (process.platform === 'win32') {
     .on('SIGINT', () => process.emit('SIGINT'));
 }
 
-process.on('SIGINT', () => shutdown('SIGINT reçu'));
-process.on('SIGTERM', () => shutdown('SIGTERM reçu'));
+process.on('SIGINT', () => shutdown('SIGINT recu'));
+process.on('SIGTERM', () => shutdown('SIGTERM recu'));
 
 module.exports = dbConnection;

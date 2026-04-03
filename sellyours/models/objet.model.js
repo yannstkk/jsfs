@@ -13,7 +13,7 @@ const ObjetSchema = new mongoose.Schema({
 
 });
 
-const Objet = dbConnection.model('Objet', taskSchema, 'objet');
+const Objet = dbConnection.model('Objet', ObjetSchema, 'objet');
 
 module.exports = ObjetSchema;
 module.exports.model = Objet

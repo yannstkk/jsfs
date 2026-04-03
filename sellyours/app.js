@@ -5,17 +5,18 @@ const logger = require('morgan');
 
 require('./controllers/db.controller');
 
-const indexRouter = require('./routes/".....".route');
-const objetRouter  = require('./routes/"....".route');
-const utilistaeurRouter  = require('./routes/"....".route');
+const indexRouter = require('./routes/index.route');
+const itemRouter = require('./routes/item.route');
+const utilisateurRouter = require('./routes/utilisateur.route');
+const accessRouter = require('./routes/access.route');
 
 
 const errorMiddleware = require('./middlewares/error.middleware');
 
 const app = express();
 
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'pug');
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -25,6 +26,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
 app.use('/item', itemRouter);
+app.use('/user', utilisateurRouter);
+app.use('/access', accessRouter);
+
 
 app.use(errorMiddleware.notFound);
 app.use(errorMiddleware.handleError);
