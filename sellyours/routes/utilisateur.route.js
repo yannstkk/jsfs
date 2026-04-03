@@ -4,5 +4,6 @@ const utilisateurController = require('../controllers/utilisateur.controller');
 const authMiddleware = require('../middlewares/authentication.middleware');
 
 router.get('/me', authMiddleware.validToken, utilisateurController.me);
+router.put('/me', authMiddleware.validToken, utilisateurController.update);
 
 module.exports = router;

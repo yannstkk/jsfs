@@ -1,29 +1,27 @@
 const mongoose = require('mongoose');
 const dbConnection = require('../controllers/db.controller');
 
-const UtilistaurSchema = new mongoose.Schema({
-  nom : {
+const UtilisateurSchema = new mongoose.Schema({
+  nom: {
     type: String,
-    required: true,   
-    unique: true      
+    required: true,
+    unique: true
   },
-  somme : { 
-        type: Number,
-        default: 100
-      },
-  login: { 
+  somme: {
+    type: Number,
+    default: 100
+  },
+  login: {
     type: String,
-     required: true,
-      unique: true
-     },
-  password: { 
+    required: true,
+    unique: true
+  },
+  password: {
     type: String,
-     required: true
-     }
-
+    required: true
+  }
 });
 
-const Utilistaur = dbConnection.model('Utilistaur', UtilistaurSchema, 'utilistaur');
+const Utilisateur = dbConnection.model('Utilisateur', UtilisateurSchema, 'utilisateur');
 
-module.exports = UtilistaurSchema;
-module.exports.model = Utilistaur
+module.exports = { schema: UtilisateurSchema, model: Utilisateur };

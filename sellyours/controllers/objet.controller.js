@@ -77,4 +77,22 @@ const buy = async (req, res) => {
 };
 
 
-module.exports = { listMine, listOthers, create, remove, buy };
+
+
+const updatePrice = async (req, res) => {
+  try {
+    // Vérifier que l'objet appartient bien à l'utilisateur courant
+    const objet = await Objet.findOne({ _id: req.params.itemId, id_utilisateur: req.userId });
+    if (!objet) return res.status(404).json({ message: 'objet introuvable ou non autorisé' });
+
+    objet.prix = req.body.prix;
+    await objet.save();
+
+    res.status(200).json(objet);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+};
+
+module.exports = { listMine, listOthers, create, remove, buy, updatePrice };
+

@@ -4,16 +4,18 @@ const dbConnection = require('../controllers/db.controller');
 const ObjetSchema = new mongoose.Schema({
   description: {
     type: String,
-    required: true,   
-    unique: true      
+    required: true
   },
-  prix: { type: Number },
-
-  id_utilisateur : mongoose.Types.ObjectId
-
+  prix: {
+    type: Number,
+    required: true
+  },
+  id_utilisateur: {
+    type: mongoose.Types.ObjectId,
+    required: true
+  }
 });
 
 const Objet = dbConnection.model('Objet', ObjetSchema, 'objet');
 
-module.exports = ObjetSchema;
-module.exports.model = Objet
+module.exports = { schema: ObjetSchema, model: Objet };
