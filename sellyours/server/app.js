@@ -10,11 +10,9 @@ const itemRouter = require('./routes/item.route');
 const utilisateurRouter = require('./routes/utilisateur.route');
 const accessRouter = require('./routes/access.route');
 
-
 const errorMiddleware = require('./middlewares/error.middleware');
 
 const app = express();
-
 
 app.use(logger('dev'));
 app.use(express.json());
@@ -26,7 +24,6 @@ app.use('/', indexRouter);
 app.use('/item', itemRouter);
 app.use('/user', utilisateurRouter);
 app.use('/access', accessRouter);
-
 
 app.use(errorMiddleware.notFound);
 app.use(errorMiddleware.handleError);

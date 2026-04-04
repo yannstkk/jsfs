@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const dbConnection = require('../controllers/db.controller');
 
-const ObjetSchema = new mongoose.Schema({
+const ItemSchema = new mongoose.Schema({
   description: {
     type: String,
     required: true
@@ -16,6 +16,6 @@ const ObjetSchema = new mongoose.Schema({
   }
 });
 
-const Objet = dbConnection.model('Objet', ObjetSchema, 'objet');
+const Item = dbConnection.model('Item', ItemSchema, 'items');
 
-module.exports = { schema: ObjetSchema, model: Objet };
+module.exports = { schema: ItemSchema, model: Item };

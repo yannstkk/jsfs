@@ -1,0 +1,27 @@
+[
+  {
+    "description": "Velo",
+    "prix": 120,
+    "id_utilisateur": { "$oid": "507f1f77bcf86cd799439011" }
+  },
+  {
+    "description": "bureau",
+    "prix": 25,
+    "id_utilisateur": { "$oid": "507f1f77bcf86cd799439011" }
+  },
+  {
+    "description": "Chaise de gaming",
+    "prix": 80,
+    "id_utilisateur": { "$oid": "507f1f77bcf86cd799439012" }
+  },
+  {
+    "description": "Casque",
+    "prix": 45,
+    "id_utilisateur": { "$oid": "507f1f77bcf86cd799439012" }
+  },
+  {
+    "description": "Livre mein kampf",
+    "prix": 1200000,
+    "id_utilisateur": { "$oid": "507f1f77bcf86cd799439012" }
+  }
+]

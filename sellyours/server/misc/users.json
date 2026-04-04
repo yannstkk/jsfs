@@ -1,0 +1,16 @@
+[
+  {
+    "_id": { "$oid": "507f1f77bcf86cd799439011" },
+    "nom": "Alice",
+    "login": "alice",
+    "password": "$2b$10$65ThtQSCetqAVl7zlagU0O/UsvfIBuu3RERH/deSYxXYpQvCvW.1q",
+    "somme": 500
+  },
+  {
+    "_id": { "$oid": "507f1f77bcf86cd799439012" },
+    "nom": "Bob",
+    "login": "bob",
+    "password": "$2b$10$vdiwZ66sUMU3DVBMSlCHLuaXhiTiQPKsqSRmKYX3al3GzTQKY.7iO",
+    "somme": 300
+  }
+]

@@ -26,15 +26,14 @@ export default function SellForm({ onCreated }) {
   return (
     <form onSubmit={handleSubmit} style={{ display: 'flex', alignItems: 'center', gap: '0.65rem', width: '100%' }}>
       <input
-        className="input-desc"
         type="text"
         value={description}
         onChange={e => setDescription(e.target.value)}
         placeholder="Description de l'objet…"
         required
+        style={{ flex: 1 }}
       />
       <input
-        className="input-prix"
         type="number"
         value={prix}
         onChange={e => setPrix(e.target.value)}
@@ -45,7 +44,7 @@ export default function SellForm({ onCreated }) {
         style={{ width: '80px' }}
       />
       {error && <span className="error-msg">{error}</span>}
-      <button className="btn-publish btn btn-primary btn-sm" disabled={loading}>
+      <button className="btn btn-primary btn-sm" disabled={loading}>
         {loading ? '…' : 'Publier'}
       </button>
     </form>

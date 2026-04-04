@@ -1,6 +1,3 @@
-// Toutes les fonctions fetch centralisées
-// Les chemins sont relatifs : pas de CORS car servi par Express
-
 export const register = async (nom, login, password) => {
   const response = await fetch('/access/register', {
     method: 'POST',

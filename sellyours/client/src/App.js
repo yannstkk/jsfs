@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
-import UserInfo from './components/UserInfo';
 import MyItems from './components/MyItems';
 import SellForm from './components/SellForm';
 import OtherItems from './components/OtherItems';
+import UserInfo from './components/UserInfo';
 import { getMe, logout } from './api/api';
 import './index.css';
 
@@ -65,16 +65,12 @@ export default function App() {
       <header className="app-header">
 
         <div className="header-account">
-          <div>
-            <div className="header-name">{user?.nom}</div>
-            <div className="header-balance">
-              {Number(user?.somme ?? 0).toFixed(2)} <em>€</em>
-            </div>
-          </div>
+          <UserInfo user={user} onUserUpdate={handleUserUpdate} />
         </div>
 
         <div className="header-divider" />
 
+        {/* Formulaire de vente inline */}
         <div className="header-sell">
           <SellForm onCreated={handleItemCreated} />
         </div>
@@ -100,14 +96,11 @@ export default function App() {
       )}
 
       <div className="app-main">
-
         <MyItems refresh={refreshMine} onDeleted={handleItemDeleted} />
-
         <div className="main-divider" />
-
         <OtherItems user={user} refresh={refreshOthers} onBought={handleBought} />
-
       </div>
+
     </div>
   );
 }
