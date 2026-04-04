@@ -29,10 +29,10 @@ export default function UserInfo({ user, onUserUpdate }) {
 
   return (
     <div className="card user-info">
-      <h3>👤 Mon compte</h3>
+      <h3>Mon compte</h3>
       <p className="user-name">{user.nom}</p>
       <p className="user-balance">
-        💰 <strong>{Number(user.somme).toFixed(2)} €</strong>
+         <strong>{Number(user.somme).toFixed(2)} €</strong>
       </p>
       {!editing ? (
         <button

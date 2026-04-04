@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { login } from '../api/api';
+import { login, getMe } from '../api/api';
 
 export default function LoginPage({ onSuccess, onGoRegister }) {
   const [form, setForm] = useState({ login: '', password: '' });
@@ -11,9 +11,9 @@ export default function LoginPage({ onSuccess, onGoRegister }) {
     setError('');
     setLoading(true);
     try {
-      const data = await login(form.login, form.password);
-      // data contient userId, nom, somme (défini dans access.controller.js)
-      onSuccess({ _id: data.userId, nom: data.nom, somme: data.somme });
+      await login(form.login, form.password);
+      const user = await getMe();
+      onSuccess(user);
     } catch (err) {
       setError(err.message);
     } finally {

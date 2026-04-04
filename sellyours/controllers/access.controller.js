@@ -32,7 +32,7 @@ const login = async (req, res) => {
 
       const token = jwt.sign({ id: user._id }, jwtConfig.SECRET_TOKEN, { expiresIn: '1h' });
       res.cookie('token', token, { maxAge: 3600000, httpOnly: true, sameSite: 'strict' });
-      res.status(200).json({ message: 'utilisater connecté', userId: user._id, nom: user.nom, somme: user.somme });
+      res.status(200).json({ message: 'utilisateur connecté' });
     } else {
       res.status(401).json({ message: `utilisateur ${req.body.login} inconnu` });
     }
@@ -44,7 +44,7 @@ const login = async (req, res) => {
 
 const logout = (req, res) => {
   res.cookie('token', '', { maxAge: 2000, httpOnly: true, sameSite: 'strict' });
-  res.status(200).json({ message: 'utilisateur deconnectee' });
+  res.status(200).json({ message: 'utilisateur déconnecté' });
 };
 
 
